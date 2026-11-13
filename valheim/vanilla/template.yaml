@@ -84,7 +84,7 @@ config:
     label:
       en: Server Password
     type: secret
-    default: secret
+    default: ""
     pattern: ^.{5,20}$
     env: PASSWORD
   - key: publicServer

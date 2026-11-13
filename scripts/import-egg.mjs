@@ -64,7 +64,10 @@ for (const v of egg.variables) {
   } else {
     const min = rules.min !== undefined ? Number(rules.min) : rules.required ? 1 : 0;
     const max = rules.max !== undefined ? Number(rules.max) : '';
-    Object.assign(field, { type: /PASS|SECRET|TOKEN/.test(v.env_variable) ? 'secret' : 'string', default: v.default_value ?? '' });
+    const secret = /PASS|SECRET|TOKEN/.test(v.env_variable);
+    // An egg's default password is public knowledge: secrets start empty, and the panel generates
+    // a random one per server (ADR 0022).
+    Object.assign(field, { type: secret ? 'secret' : 'string', default: secret ? '' : (v.default_value ?? '') });
     if (rules.in) field.pattern = `^(${rules.in.split(',').map(escape).join('|')})$`;
     else if (rules.regex) field.pattern = rules.regex.replace(/^\/(.*)\/[a-z]*$/, '$1');
     else if (min > 0 || max !== '') field.pattern = `^.{${min},${max}}$`;
