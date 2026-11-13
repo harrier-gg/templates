@@ -1,0 +1,286 @@
+{
+  "templates": [
+    {
+      "schemaVersion": 1,
+      "id": "minecraft-java",
+      "abstract": true,
+      "game": {
+        "id": "minecraft-java",
+        "name": "Minecraft: Java Edition"
+      },
+      "install": {
+        "method": "image"
+      },
+      "runtime": {
+        "image": "itzg/minecraft-server:java25",
+        "java": {
+          "8": "itzg/minecraft-server:java8",
+          "11": "itzg/minecraft-server:java11",
+          "16": "itzg/minecraft-server:java16",
+          "17": "itzg/minecraft-server:java17",
+          "21": "itzg/minecraft-server:java21",
+          "25": "itzg/minecraft-server:java25"
+        },
+        "env": {
+          "EULA": "TRUE",
+          "MEMORY": "",
+          "JVM_XX_OPTS": "-XX:MaxRAMPercentage=75.0"
+        }
+      },
+      "versions": {
+        "provider": "mojang"
+      },
+      "ports": [
+        {
+          "name": "game",
+          "container": 25565,
+          "protocol": "tcp"
+        }
+      ],
+      "config": [
+        {
+          "key": "version",
+          "label": {
+            "en": "Minecraft version",
+            "de": "Minecraft-Version"
+          },
+          "type": "version",
+          "default": "LATEST",
+          "env": "VERSION"
+        },
+        {
+          "key": "memory",
+          "label": {
+            "en": "Memory (MB)",
+            "de": "Arbeitsspeicher (MB)"
+          },
+          "type": "integer",
+          "default": 2048,
+          "min": 1024,
+          "max": 32768,
+          "limit": "memory"
+        },
+        {
+          "key": "sleepAfter",
+          "label": {
+            "en": "Sleep after (minutes without players, 0 = never)",
+            "de": "Schlafen nach (Minuten ohne Spieler, 0 = nie)"
+          },
+          "type": "integer",
+          "default": 15,
+          "min": 0,
+          "max": 1440,
+          "limit": "sleep"
+        }
+      ],
+      "files": [
+        {
+          "path": "server.properties",
+          "description": {
+            "en": "Most server settings: difficulty, game mode, max. players, whitelist, view distance … Since Minecraft 1.21.9, PvP and some others are game rules: set them in the console, e.g. /gamerule pvp false.",
+            "de": "Die meisten Servereinstellungen: Schwierigkeit, Spielmodus, max. Spieler, Whitelist, Sichtweite … Seit Minecraft 1.21.9 sind PvP und einige andere Spielregeln: Stelle sie in der Konsole ein, z. B. /gamerule pvp false."
+          }
+        }
+      ],
+      "lifecycle": {
+        "ready": "Done \\([0-9.]+s\\)!",
+        "stopTimeoutSecs": 60
+      },
+      "capabilities": {
+        "console": {
+          "via": "stdin"
+        },
+        "players": {
+          "protocol": "minecraft"
+        },
+        "sleep": {
+          "wake": "minecraft"
+        },
+        "backup": {
+          "before": [
+            "save-off",
+            "save-all flush"
+          ],
+          "ready": "^\\[[0-9:]{8}(\\] \\[Server thread/INFO\\]| INFO\\]): (System chat: )?Saved the game$",
+          "after": [
+            "save-on"
+          ],
+          "exclude": [
+            "libraries",
+            "versions",
+            ".cache",
+            "cache",
+            ".fabric",
+            "*.jar"
+          ]
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "minecraft-java/fabric",
+      "extends": "minecraft-java",
+      "variant": {
+        "id": "fabric",
+        "name": "Fabric",
+        "description": {
+          "en": "Lightweight mod loader for Fabric mods.",
+          "de": "Leichtgewichtiger Mod-Loader für Fabric-Mods."
+        }
+      },
+      "runtime": {
+        "env": {
+          "TYPE": "FABRIC"
+        }
+      },
+      "versions": {
+        "provider": "fabric"
+      },
+      "content": [
+        {
+          "kind": "mod",
+          "label": {
+            "en": "Mods",
+            "de": "Mods"
+          },
+          "path": "mods",
+          "sources": [
+            {
+              "provider": "modrinth",
+              "type": "mod",
+              "loader": "fabric"
+            }
+          ]
+        }
+      ],
+      "share": {
+        "format": "mrpack",
+        "loader": "fabric-loader"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "minecraft-java/modrinth-modpack",
+      "extends": "minecraft-java",
+      "variant": {
+        "id": "modrinth-modpack",
+        "name": "Modrinth modpack",
+        "description": {
+          "en": "Any modpack from Modrinth (Fabric, Forge, NeoForge, Quilt). The server installs its loader and server mods itself.",
+          "de": "Ein beliebiges Modpack von Modrinth (Fabric, Forge, NeoForge, Quilt). Der Server installiert Loader und Server-Mods selbst."
+        }
+      },
+      "runtime": {
+        "env": {
+          "TYPE": "MODRINTH"
+        }
+      },
+      "config": [
+        {
+          "key": "modpack",
+          "label": {
+            "en": "Modpack (name or link from modrinth.com)",
+            "de": "Modpack (Name oder Link von modrinth.com)"
+          },
+          "type": "modpack",
+          "default": "adrenaserver",
+          "env": "MODRINTH_MODPACK"
+        },
+        {
+          "key": "version",
+          "label": {
+            "en": "Minecraft version",
+            "de": "Minecraft-Version"
+          },
+          "type": "version",
+          "default": "LATEST",
+          "env": "VERSION"
+        },
+        {
+          "key": "memory",
+          "label": {
+            "en": "Memory (MB)",
+            "de": "Arbeitsspeicher (MB)"
+          },
+          "type": "integer",
+          "default": 4096,
+          "min": 2048,
+          "max": 32768,
+          "limit": "memory"
+        },
+        {
+          "key": "sleepAfter",
+          "label": {
+            "en": "Sleep after (minutes without players, 0 = never)",
+            "de": "Schlafen nach (Minuten ohne Spieler, 0 = nie)"
+          },
+          "type": "integer",
+          "default": 15,
+          "min": 0,
+          "max": 1440,
+          "limit": "sleep"
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "id": "minecraft-java/paper",
+      "extends": "minecraft-java",
+      "variant": {
+        "id": "paper",
+        "name": "Paper",
+        "description": {
+          "en": "Fast server with plugin support (Bukkit/Paper API).",
+          "de": "Schneller Server mit Plugin-Unterstützung (Bukkit/Paper-API)."
+        }
+      },
+      "runtime": {
+        "env": {
+          "TYPE": "PAPER"
+        }
+      },
+      "versions": {
+        "provider": "papermc"
+      },
+      "content": [
+        {
+          "kind": "plugin",
+          "label": {
+            "en": "Plugins",
+            "de": "Plugins"
+          },
+          "path": "plugins",
+          "sources": [
+            {
+              "provider": "modrinth",
+              "type": "plugin",
+              "loader": "paper"
+            },
+            {
+              "provider": "hangar",
+              "platform": "PAPER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "id": "minecraft-java/vanilla",
+      "extends": "minecraft-java",
+      "variant": {
+        "id": "vanilla",
+        "name": "Vanilla",
+        "description": {
+          "en": "The official server from Mojang.",
+          "de": "Der offizielle Server von Mojang."
+        }
+      },
+      "runtime": {
+        "env": {
+          "TYPE": "VANILLA"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "harrier-templates",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "index": "node scripts/build-index.mjs",
+    "validate": "node scripts/validate.mjs",
+    "check": "npm run index && git diff --exit-code index.json && npm run validate"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "yaml": "^2.9.1"
+  }
+}

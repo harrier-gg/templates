@@ -1,0 +1,75 @@
+# Abstract base for all Minecraft: Java Edition variants (ADR 0005).
+# Variants extend it and only set what differs. Image: https://github.com/itzg/docker-minecraft-server
+schemaVersion: 1
+id: minecraft-java
+abstract: true
+game:
+  id: minecraft-java
+  name: "Minecraft: Java Edition"
+install:
+  method: image
+runtime:
+  # Used when the Java a version needs is unknown (e.g. the panel is offline).
+  image: itzg/minecraft-server:java25
+  # The panel picks the image with the Java the chosen version needs (ADR 0012).
+  java:
+    "8": itzg/minecraft-server:java8
+    "11": itzg/minecraft-server:java11
+    "16": itzg/minecraft-server:java16
+    "17": itzg/minecraft-server:java17
+    "21": itzg/minecraft-server:java21
+    "25": itzg/minecraft-server:java25
+  env:
+    EULA: "TRUE"
+    # Heap as a share of the container limit instead of a fixed -Xmx, so "memory" is the only knob.
+    MEMORY: ""
+    JVM_XX_OPTS: "-XX:MaxRAMPercentage=75.0" # "75.0", not "75": Java 8 only takes a decimal
+versions:
+  provider: mojang
+ports:
+  - name: game
+    container: 25565
+    protocol: tcp
+config:
+  - key: version
+    label: { en: Minecraft version, de: Minecraft-Version }
+    type: version
+    default: LATEST
+    env: VERSION
+  - key: memory
+    label: { en: Memory (MB), de: Arbeitsspeicher (MB) }
+    type: integer
+    default: 2048
+    min: 1024
+    max: 32768
+    limit: memory
+  - key: sleepAfter
+    label: { en: "Sleep after (minutes without players, 0 = never)", de: "Schlafen nach (Minuten ohne Spieler, 0 = nie)" }
+    type: integer
+    default: 15
+    min: 0
+    max: 1440
+    limit: sleep
+# Game settings live in the game's own files, which match the running version (ADR 0011).
+files:
+  - path: server.properties
+    description:
+      en: "Most server settings: difficulty, game mode, max. players, whitelist, view distance … Since Minecraft 1.21.9, PvP and some others are game rules: set them in the console, e.g. /gamerule pvp false."
+      de: "Die meisten Servereinstellungen: Schwierigkeit, Spielmodus, max. Spieler, Whitelist, Sichtweite … Seit Minecraft 1.21.9 sind PvP und einige andere Spielregeln: Stelle sie in der Konsole ein, z. B. /gamerule pvp false."
+lifecycle:
+  ready: 'Done \([0-9.]+s\)!'
+  stopTimeoutSecs: 60
+capabilities:
+  console: { via: stdin }
+  players: { protocol: minecraft } # Server List Ping on the game port (ADR 0009)
+  sleep: { wake: minecraft } # joining a sleeping server wakes it (ADR 0013)
+  # Saving off while the world is copied, so the backup is consistent (ADR 0016). Server jars and
+  # libraries are downloaded again by the image, so backups leave them out.
+  backup:
+    before: [save-off, save-all flush]
+    # The game's own log line, anchored at both ends: players can write anything into chat, and
+    # the agent checks console patterns one whole line at a time. Vanilla/Fabric print
+    # "[12:00:00] [Server thread/INFO]: …", Paper "[12:00:00 INFO]: …".
+    ready: '^\[[0-9:]{8}(\] \[Server thread/INFO\]| INFO\]): (System chat: )?Saved the game$'
+    after: [save-on]
+    exclude: [libraries, versions, .cache, cache, .fabric, '*.jar']

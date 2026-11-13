@@ -1,0 +1,20 @@
+schemaVersion: 1
+id: minecraft-java/paper
+extends: minecraft-java
+variant:
+  id: paper
+  name: Paper
+  description: { en: Fast server with plugin support (Bukkit/Paper API)., de: Schneller Server mit Plugin-Unterstützung (Bukkit/Paper-API). }
+runtime:
+  env:
+    TYPE: PAPER
+versions:
+  provider: papermc
+# Plugins and where to find them (ADR 0017); more sources (Hangar) are more entries.
+content:
+  - kind: plugin
+    label: { en: Plugins, de: Plugins }
+    path: plugins
+    sources:
+      - { provider: modrinth, type: plugin, loader: paper }
+      - { provider: hangar, platform: PAPER }
