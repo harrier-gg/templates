@@ -443,7 +443,7 @@
           "label": {
             "en": "Beta Password"
           },
-          "type": "secret",
+          "type": "string",
           "default": "",
           "pattern": "^.{0,30}$",
           "env": "SRCDS_BETAPASS"

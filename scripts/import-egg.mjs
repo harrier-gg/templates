@@ -64,9 +64,10 @@ for (const v of egg.variables) {
   } else {
     const min = rules.min !== undefined ? Number(rules.min) : rules.required ? 1 : 0;
     const max = rules.max !== undefined ? Number(rules.max) : '';
-    const secret = /PASS|SECRET|TOKEN/.test(v.env_variable);
-    // An egg's default password is public knowledge: secrets start empty, and the panel generates
-    // a random one per server (ADR 0022).
+    // A required password is one the panel can pick. An egg's default is public knowledge, so
+    // secrets start empty and the panel generates one per server (ADR 0022). Optional ones (like a
+    // Steam beta password) are values the user enters, so they stay plain text.
+    const secret = Boolean(rules.required) && /PASS|SECRET|TOKEN/.test(v.env_variable);
     Object.assign(field, { type: secret ? 'secret' : 'string', default: secret ? '' : (v.default_value ?? '') });
     if (rules.in) field.pattern = `^(${rules.in.split(',').map(escape).join('|')})$`;
     else if (rules.regex) field.pattern = rules.regex.replace(/^\/(.*)\/[a-z]*$/, '$1');
