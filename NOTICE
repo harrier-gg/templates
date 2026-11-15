@@ -3,6 +3,7 @@ scripts/import-egg.mjs. Their origin is named at the top of each template.yaml. 
 their install scripts are licensed as follows.
 
 valheim/vanilla: https://github.com/pelican-eggs/games-steamcmd (valheim/valheim_vanilla)
+valheim/bepinex: https://github.com/pelican-eggs/games-steamcmd (valheim/valheim_bepinex)
 
 MIT
 
