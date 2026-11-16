@@ -12,14 +12,14 @@
         "method": "image"
       },
       "runtime": {
-        "image": "itzg/minecraft-server:java25",
+        "image": "itzg/minecraft-server:java25@sha256:e528e38848e1456d683a60c624ce2b1a5ae15d1b221d368108fa05853388285a",
         "java": {
-          "8": "itzg/minecraft-server:java8",
-          "11": "itzg/minecraft-server:java11",
-          "16": "itzg/minecraft-server:java16",
-          "17": "itzg/minecraft-server:java17",
-          "21": "itzg/minecraft-server:java21",
-          "25": "itzg/minecraft-server:java25"
+          "8": "itzg/minecraft-server:java8@sha256:1ac667950a71819a43fb309ec452b496f33e5240f8eb413d2cd09bf67990b394",
+          "11": "itzg/minecraft-server:java11@sha256:b87e70b997bd68a3beba06e3b8cac2abba9c1832350a14a8f0be6701ecaa5b70",
+          "16": "itzg/minecraft-server:java16@sha256:55b25028d92b8dfbb2875480169853c617adeca7474bd888aee2473acf2f526d",
+          "17": "itzg/minecraft-server:java17@sha256:88e3431bd8ef7596375724e5969737f36e792322376a520426b4acb4c785c96c",
+          "21": "itzg/minecraft-server:java21@sha256:ad1c2569ab3a4e6f032cb04e528455f8a2130196f82b2b37d5842abe032fda2e",
+          "25": "itzg/minecraft-server:java25@sha256:e528e38848e1456d683a60c624ce2b1a5ae15d1b221d368108fa05853388285a"
         },
         "env": {
           "EULA": "TRUE",
@@ -298,12 +298,12 @@
       },
       "install": {
         "method": "script",
-        "image": "ghcr.io/parkervcp/installers:debian",
+        "image": "ghcr.io/parkervcp/installers:debian@sha256:9c394a48db589e66796d72b058def5e9caf0df8750dc45ef221e653b2a7c3e07",
         "entrypoint": "bash",
         "script": "#!/bin/bash\n# Valheim Installation Script\n#\n# Server Files: /mnt/server\n# Image to install with is 'debian:buster-slim'\napt -y update\napt -y --no-install-recommends --no-install-suggests install wget\n\n## just in case someone removed the defaults.\nif [ \"${STEAM_USER}\" == \"\" ]; then\n    echo -e \"steam user is not set.\\n\"\n    echo -e \"Using anonymous user.\\n\"\n    # ------------------------------\n    # Steam user defaults\n    # ------------------------------\n    : \"${STEAM_USER:=anonymous}\"\n    : \"${STEAM_PASS:=}\"\n    : \"${STEAM_AUTH:=}\"\nelse\n    echo -e \"user set to ${STEAM_USER}\"\nfi\n\n## download and install steamcmd\ncd /tmp\nmkdir -p /mnt/server/steamcmd\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\ncd /mnt/server/steamcmd\n\n# SteamCMD fails otherwise for some reason, even running as root.\n# This is changed at the end of the install process anyways.\nchown -R root:root /mnt\nexport HOME=/mnt/server\n\n## install game using steamcmd\n./steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${EXTRA_FLAGS} +quit\n\n## set up 32 bit libraries\nmkdir -p /mnt/server/.steam/sdk32\ncp -v linux32/steamclient.so ../.steam/sdk32/steamclient.so\n\n## set up 64 bit libraries\nmkdir -p /mnt/server/.steam/sdk64\ncp -v linux64/steamclient.so ../.steam/sdk64/steamclient.so\n\necho \"-------------------------------------------------------\"\necho \"installing BepInEx...\"\necho \"-------------------------------------------------------\"\nif ! api_response=$(curl -sfSL -H \"accept: application/json\" \"$BEPINEX_URL\"); then\n        fatal \"Error: could not retrieve BepInEx release info from Thunderstore.io API\"\nfi\n\ndownload_url=$(jq -r  \".latest.download_url\" <<< \"$api_response\" )\nversion_number=$(jq -r  \".latest.version_number\" <<< \"$api_response\" )\n\n\ncd /mnt/server\n#echo $download_url\nwget --content-disposition $download_url\nunzip -o denikson-BepInExPack_Valheim-${version_number}.zip\ncp -r /mnt/server/BepInExPack_Valheim/* /mnt/server\n\n\n##cleanup\necho \"-------------------------------------------------------\"\necho \"cleanup files...\"\necho \"-------------------------------------------------------\"\nrm -fR BepInExPack_Valheim\nrm -fR icon.png\nrm -fR denikson-BepInExPack_Valheim-*\nrm -fR manifest.json\nrm -fR README.m\n\n#rm -fR start_*\n\necho \"-------------------------------------------------------\"\necho \"Installation completed\"\necho \"-------------------------------------------------------\""
       },
       "runtime": {
-        "image": "ghcr.io/parkervcp/games:valheim",
+        "image": "ghcr.io/parkervcp/games:valheim@sha256:6e11692e833a7d4b3d0ccc3d616f9154626c94ce848ffe9a8b17278659b2d91d",
         "mountPath": "/home/container",
         "startup": "export DOORSTOP_ENABLED=1; export DOORSTOP_TARGET_ASSEMBLY=./BepInEx/core/BepInEx.Preloader.dll; export LD_LIBRARY_PATH=\"./doorstop_libs:./linux64:$LD_LIBRARY_PATH\"; export LD_PRELOAD=\"libdoorstop_x64.so:$LD_PRELOAD\"; export LD_LIBRARY_PATH=\"./linux64:$LD_LIBRARY_PATH\"; export SteamAppId=892970; ./valheim_server.x86_64 -nographics -batchmode -name \"{{SERVER_NAME}}\" -port {{SERVER_PORT}} -world \"{{WORLD}}\" -password \"{{PASSWORD}}\" -public {{PUBLIC_SERVER}} -saveinterval {{BACKUP_INTERVAL}} -backups {{BACKUP_COUNT}} -backupshort {{BACKUP_SHORTTIME}} -backuplong {{BACKUP_LONGTIME}} $( [[ {{ENABLE_CROSSPLAY}} -eq 1 ]] && echo \" -crossplay \") > >(sed -uE \"{{CONSOLE_FILTER}}\")",
         "env": {
@@ -535,12 +535,12 @@
       },
       "install": {
         "method": "script",
-        "image": "ghcr.io/parkervcp/installers:debian",
+        "image": "ghcr.io/parkervcp/installers:debian@sha256:9c394a48db589e66796d72b058def5e9caf0df8750dc45ef221e653b2a7c3e07",
         "entrypoint": "bash",
         "script": "#!/bin/bash\n# steamcmd Base Installation Script\n#\n# Server Files: /mnt/server\n# Image to install with is 'ghcr.io/parkervcp/installers:debian'\n\n##\n#\n# Variables\n# STEAM_USER, STEAM_PASS, STEAM_AUTH - Steam user setup. If a user has 2fa enabled it will most likely fail due to timeout. Leave blank for anon install.\n# WINDOWS_INSTALL - if it's a windows server you want to install set to 1\n# SRCDS_APPID - steam app id found here - https://developer.valvesoftware.com/wiki/Dedicated_Servers_List\n# SRCDS_BETAID - beta branch of a steam app. Leave blank to install normal branch\n# SRCDS_BETAPASS - password for a beta branch should one be required during private or closed testing phases.. Leave blank for no password.\n# INSTALL_FLAGS - Any additional SteamCMD  flags to pass during install.. Keep in mind that steamcmd auto update process in the docker image might overwrite or ignore these when it performs update on server boot.\n# AUTO_UPDATE - Adding this variable to the egg allows disabling or enabling automated updates on boot. Boolean value. 0 to disable and 1 to enable.\n#\n ##\n\n# Install packages. Default packages below are not required if using our existing install image thus speeding up the install process.\napt -y update\napt -y --no-install-recommends install curl lib32gcc-s1 ca-certificates\n\n## just in case someone removed the defaults.\nif [[ \"${STEAM_USER}\" == \"\" ]] || [[ \"${STEAM_PASS}\" == \"\" ]]; then\n    echo -e \"steam user is not set.\\n\"\n    echo -e \"Using anonymous user.\\n\"\n    STEAM_USER=anonymous\n    STEAM_PASS=\"\"\n    STEAM_AUTH=\"\"\nelse\n    echo -e \"user set to ${STEAM_USER}\"\nfi\n\n## download and install steamcmd\ncd /tmp\nmkdir -p /mnt/server/steamcmd\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\nmkdir -p /mnt/server/steamapps # Fix steamcmd disk write error when this folder is missing\ncd /mnt/server/steamcmd\n\n# SteamCMD fails otherwise for some reason, even running as root.\n# This is changed at the end of the install process anyways.\nchown -R root:root /mnt\nexport HOME=/mnt/server\n\n## install game using steamcmd\n./steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} $( [[ \"${WINDOWS_INSTALL}\" == \"1\" ]] && printf %s '+@sSteamCmdForcePlatformType windows' ) +app_update ${SRCDS_APPID} $( [[ -z ${SRCDS_BETAID} ]] || printf %s \"-beta ${SRCDS_BETAID}\" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s \"-betapassword ${SRCDS_BETAPASS}\" ) ${INSTALL_FLAGS} validate +quit ## other flags may be needed depending on install. looking at you cs 1.6\n\n## set up 32 bit libraries\nmkdir -p /mnt/server/.steam/sdk32\ncp -v linux32/steamclient.so ../.steam/sdk32/steamclient.so\n\n## set up 64 bit libraries\nmkdir -p /mnt/server/.steam/sdk64\ncp -v linux64/steamclient.so ../.steam/sdk64/steamclient.so"
       },
       "runtime": {
-        "image": "ghcr.io/parkervcp/games:valheim",
+        "image": "ghcr.io/parkervcp/games:valheim@sha256:6e11692e833a7d4b3d0ccc3d616f9154626c94ce848ffe9a8b17278659b2d91d",
         "mountPath": "/home/container",
         "startup": "./valheim_server.x86_64 -nographics -batchmode -name \"{{SERVER_NAME}}\" -port {{SERVER_PORT}} -world \"{{WORLD}}\" -password \"{{PASSWORD}}\" -public {{PUBLIC_SERVER}} -saveinterval {{BACKUP_INTERVAL}} -backups {{BACKUP_COUNT}} -backupshort {{BACKUP_SHORTTIME}} -backuplong {{BACKUP_LONGTIME}} $( [[ {{ENABLE_CROSSPLAY}} -eq 1 ]] && echo \" -crossplay \") > >(sed -uE \"{{CONSOLE_FILTER}}\")",
         "env": {
