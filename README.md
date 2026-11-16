@@ -26,7 +26,8 @@ npm run pin        # pin every image to the digest its tag points to now (commit
 
 Images are pinned as `name:tag@sha256:…`, so a published template can't get a different image
 without a commit here; Docker pulls the digest, and the tag tells `npm run pin` what to resolve
-again. CI rejects unpinned images. Run `npm run pin` after adding an image or to take image updates.
+again. CI rejects unpinned images. Run `npm run pin` after adding an image. Image updates come from the
+weekly "Pin images" workflow, which opens one PR with the new digests (or run it by hand).
 
 An image must work under any user ID: the agent runs the game as the owner of the server's data
 directory, or as uid 50000 when the agent itself runs as root. It writes only to the mount path.
