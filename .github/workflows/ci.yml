@@ -16,5 +16,7 @@ jobs:
       - run: npm ci
       - name: index.json is up to date (otherwise run `npm run index` and commit)
         run: npm run index && git diff --exit-code index.json
+      - name: Every image is pinned to a digest (otherwise run `npm run pin` and commit)
+        run: node scripts/pin-images.mjs --check
       - name: Templates match the panel's schema (template.schema.json on harrier-gg/backend main)
         run: npm run validate

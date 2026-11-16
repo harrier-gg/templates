@@ -21,7 +21,15 @@ see ADR 0005 (games, variants, providers) and ADR 0022 (script installs and Pter
 npm ci
 npm run index      # rebuild index.json after changing a template (commit it)
 npm run validate   # check every template against the panel's schema
+npm run pin        # pin every image to the digest its tag points to now (commit it)
 ```
+
+Images are pinned as `name:tag@sha256:…`, so a published template can't get a different image
+without a commit here; Docker pulls the digest, and the tag tells `npm run pin` what to resolve
+again. CI rejects unpinned images. Run `npm run pin` after adding an image or to take image updates.
+
+An image must work under any user ID: the agent runs the game as the owner of the server's data
+directory, or as uid 50000 when the agent itself runs as root. It writes only to the mount path.
 
 To try a template in a local panel, start the backend with
 `HARRIER_TEMPLATES_URL=file:///path/to/templates/index.json`.
@@ -40,4 +48,4 @@ node scripts/import-egg.mjs <egg.json | https://…> --id valheim/vanilla --game
 It writes `<id>/template.yaml` and `<id>/install.sh`. Review the result before committing:
 egg variables become settings (passwords become secrets the panel generates per server), the
 egg's `done` text becomes the ready pattern, and its stop command becomes a signal or a command.
-Add the egg's source to [`NOTICE`](NOTICE).
+Add the egg's source to [`NOTICE`](NOTICE) and run `npm run pin`.
