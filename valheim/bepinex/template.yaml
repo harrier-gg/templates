@@ -161,4 +161,8 @@ content:
     label: { en: Mods, de: Mods }
     path: BepInEx/plugins
     sources:
-      - { provider: thunderstore, community: valheim, provides: [denikson-BepInExPack_Valheim] }
+      - provider: thunderstore
+        community: valheim
+        provides: [denikson-BepInExPack_Valheim]
+        # BepInEx loads patchers and MonoMod patches only from these folders (ADR 0023).
+        folders: { patchers: BepInEx/patchers, monomod: BepInEx/monomod }

@@ -513,7 +513,11 @@
               "community": "valheim",
               "provides": [
                 "denikson-BepInExPack_Valheim"
-              ]
+              ],
+              "folders": {
+                "patchers": "BepInEx/patchers",
+                "monomod": "BepInEx/monomod"
+              }
             }
           ]
         }
