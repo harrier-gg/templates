@@ -15,7 +15,7 @@ install:
   image: ghcr.io/parkervcp/installers:debian@sha256:9c394a48db589e66796d72b058def5e9caf0df8750dc45ef221e653b2a7c3e07
   entrypoint: bash
 runtime:
-  image: ghcr.io/parkervcp/games:valheim@sha256:6e11692e833a7d4b3d0ccc3d616f9154626c94ce848ffe9a8b17278659b2d91d
+  image: ghcr.io/parkervcp/games:valheim@sha256:c851b055fa784608244b9e494ada4af421f78001e42e71bf5aa73ded2b321ad1
   mountPath: /home/container
   startup: ./valheim_server.x86_64 -nographics -batchmode -name "{{SERVER_NAME}}" -port {{SERVER_PORT}} -world "{{WORLD}}" -password "{{PASSWORD}}" -public {{PUBLIC_SERVER}} -saveinterval {{BACKUP_INTERVAL}} -backups {{BACKUP_COUNT}} -backupshort {{BACKUP_SHORTTIME}} -backuplong {{BACKUP_LONGTIME}} $( [[ {{ENABLE_CROSSPLAY}} -eq 1 ]] && echo " -crossplay ") > >(sed -uE "{{CONSOLE_FILTER}}")
   env:

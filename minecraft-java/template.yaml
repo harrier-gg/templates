@@ -10,15 +10,15 @@ install:
   method: image
 runtime:
   # Used when the Java a version needs is unknown (e.g. the panel is offline).
-  image: itzg/minecraft-server:java25@sha256:e528e38848e1456d683a60c624ce2b1a5ae15d1b221d368108fa05853388285a
+  image: itzg/minecraft-server:java25@sha256:dc15f05423064860968043de873316dbd0c027a7d9c8354826229d7c20dd4619
   # The panel picks the image with the Java the chosen version needs (ADR 0012).
   java:
-    "8": itzg/minecraft-server:java8@sha256:1ac667950a71819a43fb309ec452b496f33e5240f8eb413d2cd09bf67990b394
-    "11": itzg/minecraft-server:java11@sha256:b87e70b997bd68a3beba06e3b8cac2abba9c1832350a14a8f0be6701ecaa5b70
-    "16": itzg/minecraft-server:java16@sha256:55b25028d92b8dfbb2875480169853c617adeca7474bd888aee2473acf2f526d
-    "17": itzg/minecraft-server:java17@sha256:88e3431bd8ef7596375724e5969737f36e792322376a520426b4acb4c785c96c
-    "21": itzg/minecraft-server:java21@sha256:ad1c2569ab3a4e6f032cb04e528455f8a2130196f82b2b37d5842abe032fda2e
-    "25": itzg/minecraft-server:java25@sha256:e528e38848e1456d683a60c624ce2b1a5ae15d1b221d368108fa05853388285a
+    "8": itzg/minecraft-server:java8@sha256:81a1b77eb5be24c432819d84645e21455ef4ede7cf8fdb96b2178320e2bb1b7e
+    "11": itzg/minecraft-server:java11@sha256:69ba5f0c479ade1f6f1c43608ed9009ba1dbe8577097cb22f1c37d23c2af7b09
+    "16": itzg/minecraft-server:java16@sha256:a25d4c1c738b253a4b7cfc654fc4842d8a5d25f4fa78679c2f1ed8db20f42304
+    "17": itzg/minecraft-server:java17@sha256:6eeaf2dc61addb28a6a6568e9c4144dfb977297fcae398cde230802c2da64cd3
+    "21": itzg/minecraft-server:java21@sha256:96d1da46d7b59bce34e86d527fdcfdc92a9636e83fbf94a3bb279de6ae07c17c
+    "25": itzg/minecraft-server:java25@sha256:dc15f05423064860968043de873316dbd0c027a7d9c8354826229d7c20dd4619
   env:
     EULA: "TRUE"
     # Heap as a share of the container limit instead of a fixed -Xmx, so "memory" is the only knob.
